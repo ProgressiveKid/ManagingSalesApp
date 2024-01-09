@@ -18,7 +18,6 @@ namespace ManagingSalesApp.Server.Controllers
         {
             db = context;
             _httpContextAccessor = httpContextAccessor;
-
         }
 
         [HttpGet]

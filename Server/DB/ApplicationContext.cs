@@ -20,9 +20,17 @@ namespace ManagingSalesApp.Server.DB
 
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
+            if (Database.CanConnect())
+            { 
+                Console.WriteLine("База данных существует и подключение установлено.");
+            }
+            else
+            { // первый вызов
+                //Console.WriteLine("База данных не существует или нет подключения.");
+                //Database.EnsureDeleted();
+                Database.EnsureCreated();
+            }
 
-            Database.EnsureDeleted();
-            Database.EnsureCreated();
         }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
