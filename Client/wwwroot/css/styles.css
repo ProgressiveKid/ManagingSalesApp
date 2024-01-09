@@ -1,0 +1,20 @@
+﻿/* styles.css */
+
+.order {
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    padding: 10px;
+    box-sizing: border-box; /* Include padding and border in the total width and height */
+}
+
+.window {
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    padding: 5px;
+    box-sizing: border-box; /* Include padding and border in the total width and height */
+}
+
+.sub-elements {
+    margin-left: 20px;
+    box-sizing: border-box; /* Include padding and border in the total width and height */
+}

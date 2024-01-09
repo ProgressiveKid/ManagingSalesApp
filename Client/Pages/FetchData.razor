@@ -1,0 +1,210 @@
+﻿@page "/fetchdata"
+@using ManagingSalesApp.Shared
+@inject HttpClient Http
+
+<PageTitle>Weather forecast</PageTitle>
+
+<h1>Menu for adding new elements</h1>
+
+<p>Choose type for Add</p>
+
+<style>
+    .image-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+        .image-container > div {
+            text-align: center;
+            margin-bottom: 30px; /* Увеличьте отступ между изображением и подписью */
+        }
+
+        .image-container img {
+            width: 10vw;
+            max-width: 75px;
+            height: auto;
+            cursor: pointer;
+            border-bottom: none !important; /* Убираем нижнюю внешнюю границу с использованием !important */
+        }
+</style>
+
+<div class="image-container">
+    <div>
+        <img src="Icons/order-50.png" alt="Добавление заказа" @onclick="ShowOrderForm" />
+        <p>Order</p>
+    </div>
+    <div>
+        <img src="Icons/window.png" alt="Добавление окна" @onclick="ShowWindowForm" />
+        <p>Window</p>
+    </div>
+    <div>
+        <img src="Icons/subelement-50.png" alt="Добавление подэлемента" @onclick="ShowSubElementForm" />
+        <p>SubElement</p>
+    </div>
+</div>
+
+@if (showOrderForm)
+{
+   <div>
+        <h4>Форма для добавления заказа</h4>
+        <div>
+        
+            <label for="stateInput">Выберите штат:</label>
+            <input type="text" id="stateInput" @bind="NewOrder.State" list="stateAbbreviations" placeholder="Введите или выберите из списка" />
+            <datalist id="stateAbbreviations">
+                @foreach (var abbreviation in GetNorthAmericanStates())
+                {
+                    <option value="@abbreviation"></option>
+                }
+            </datalist>
+        </div>
+        <div>
+            <label for="nameInput">Введите название:</label>
+            <input type="text" id="nameInput" @bind="NewOrder.Name" placeholder="Введите название" />
+        </div>
+
+        <div>
+            <label for="nameInput">Добавить к заказу окно</label>
+            <div @onclick="ToggleWindowSubMenu">
+                <img src="Icons/addElement.png" alt="Добавление окна" />
+                <p>Window</p>
+            </div>
+            @if (showWindowSubMenu)
+            {
+                <div class="sub-menu">
+                    <!-- Здесь добавьте содержимое вашего вложенного меню -->
+                    <!-- Например, поля для ввода параметров окна -->
+
+                    <div class="sub-menu">
+                        <label>Название:</label>
+                        <input type="text" @bind="NewWindow.Name" />
+
+                        <label>Количество окон:</label>
+                        <input type="number" @bind="NewWindow.QuantityOfWindows" />
+
+                     
+                    </div>
+                    <button @onclick="AddWindow">Добавить окно</button>
+                </div>
+            }
+            @if (NewOrder.Windows.Any())
+            {
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Добавленные окна</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var window in NewOrder.Windows)
+                        {
+                            <tr @onclick="() => SelectWindow(window)">
+                                <td>@window.Name</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+               
+
+            }
+        </div>
+   </div>
+}
+
+@if (showWindowForm)
+{
+    <div class="form-container">
+        <h4>Форма для добавления окна</h4>
+        <!-- Здесь разместите форму для добавления окна -->
+    </div>
+}
+
+@if (showSubElementForm)
+{
+    <div class="form-container">
+        <h4>Форма для добавления подэлемента</h4>
+        <!-- Здесь разместите форму для добавления подэлемента -->
+    </div>
+}
+
+@code {
+    Order NewOrder = new Order();
+    Window NewWindow = new Window();
+
+    #region containers
+    private bool showOrderForm = false;
+    private bool showWindowSubMenu = false;
+
+    private void ShowOrderForm()
+    {
+        showOrderForm = true;
+        showWindowForm = false;
+        showSubElementForm = false;
+    }
+
+    private void ToggleWindowSubMenu()
+    {
+        showWindowSubMenu = !showWindowSubMenu;
+    }
+
+    private bool showWindowForm = false;
+
+    private void ShowWindowForm()
+    {
+        showOrderForm = false;
+        showWindowForm = true;
+        showSubElementForm = false;
+    }
+
+    private bool showSubElementForm = false;
+
+    private void ShowSubElementForm()
+    {
+        showOrderForm = false;
+        showWindowForm = false;
+        showSubElementForm = true;
+    }
+
+    #endregion
+
+
+    private void HandleStateSelection(ChangeEventArgs e)
+    {
+        string selectedState = e.Value.ToString();
+        // Ваш код обработки выбранного штата
+    }
+    private List<string> GetNorthAmericanStates()
+    {
+        return new List<string>
+        {
+            "AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA",
+            "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD",
+            "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ",
+            "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC",
+            "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY"
+        };
+    }
+
+    private void SelectWindow(Window window)
+    {
+        Window selectedWindow = NewOrder.Windows.FirstOrDefault(u => u.Name == window.Name && u.QuantityOfWindows == window.QuantityOfWindows);
+        // логика того как будет меняться содержмиое дива
+       // NewOrder.Windows = window;
+    }
+
+
+    private void AddWindow()
+    {
+
+        NewOrder.Windows.Add(NewWindow);
+        // В этом методе вы можете обработать создание окна
+        // Например, добавить NewWindow в список окон в заказе
+        // и сбросить значения полей для следующего ввода
+        // orders.AddWindow(NewWindow);
+        // NewWindow = new WindowModel();
+    }
+
+}

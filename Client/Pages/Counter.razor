@@ -1,0 +1,54 @@
+﻿@page "/counter"
+@using ManagingSalesApp.Shared
+@using System.Text.Json;
+@using System.Text.Json.Serialization;
+@inject HttpClient Http
+
+<PageTitle>Weather forecast</PageTitle>
+
+
+<p>Visual display of all orders</p>
+
+@if (orders == null)
+{ //TODO сделать анимацию тут
+    <p><em>Loading...</em></p>
+}
+else{
+    <link rel="stylesheet" href="css/styles.css" />
+    @foreach (var order in orders)
+    {
+        <div class="order">
+            <h4>Order Name: @order.Name</h4>
+            <h4>State: @order.State</h4>
+            <div class="windows">
+                <h5>Windows:</h5>
+                @foreach (var window in order.Windows)
+                {
+                    <div class="window">
+                        <p>Window: @window.Name</p>
+                        <p>Quantity of Windows: @window.QuantityOfWindows</p>
+                        <p>Total SubElements: @window.TotalSubElements</p>
+                        <div class="sub-elements">
+                            <h6>SubElements:</h6>
+                            @foreach (var subElement in window.SubElements)
+                            {
+                                <p>Element: @subElement.Id, Type: @subElement.Type, Width: @subElement.Width, Height: @subElement.Height</p>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private WeatherForecast[]? forecasts;
+    private Order[]? orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+     
+        orders = await Http.GetFromJsonAsync<Order[]>("Order");
+    }
+}
