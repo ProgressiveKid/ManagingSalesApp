@@ -78,38 +78,20 @@
                     <!-- Например, поля для ввода параметров окна -->
 
                     <div class="sub-menu">
-                        <label>Название:</label>
-                        <input type="text" @bind="NewWindow.Name" />
-
-                        <label>Количество окон:</label>
-                        <input type="number" @bind="NewWindow.QuantityOfWindows" />
-
+                        <div>
+                            <label>Название:</label>
+                            <input type="text" @bind="NewWindow.Name" />
+                        </div>
+                         <div>
+                            <label>Количество окон:</label>
+                            <input type="number" @bind="NewWindow.QuantityOfWindows" />
+                        </div>
                      
                     </div>
                     <button @onclick="AddWindow">Добавить окно</button>
                 </div>
             }
-            @if (NewOrder.Windows.Any())
-            {
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Добавленные окна</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var window in NewOrder.Windows)
-                        {
-                            <tr @onclick="() => SelectWindow(window)">
-                                <td>@window.Name</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-
-               
-
-            }
+         
         </div>
    </div>
 }
@@ -137,7 +119,8 @@
     #region containers
     private bool showOrderForm = false;
     private bool showWindowSubMenu = false;
-
+    private bool showWindowForm = false;
+    private bool showSubElementForm = false;
     private void ShowOrderForm()
     {
         showOrderForm = true;
@@ -150,7 +133,7 @@
         showWindowSubMenu = !showWindowSubMenu;
     }
 
-    private bool showWindowForm = false;
+   
 
     private void ShowWindowForm()
     {
@@ -159,7 +142,7 @@
         showSubElementForm = false;
     }
 
-    private bool showSubElementForm = false;
+   
 
     private void ShowSubElementForm()
     {
