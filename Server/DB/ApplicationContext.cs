@@ -21,8 +21,10 @@ namespace ManagingSalesApp.Server.DB
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             if (Database.CanConnect())
-            { 
+            {
                 Console.WriteLine("База данных существует и подключение установлено.");
+                Database.EnsureDeleted();
+                Database.EnsureCreated();
             }
             else
             { // первый вызов
@@ -60,12 +62,20 @@ namespace ManagingSalesApp.Server.DB
             modelBuilder.Entity<SubElement>()
                 .HasKey(s => s.Id);
 
-            //modelBuilder.Entity<Order>()
-            //    .HasMany(o => o.Windows)
-            //    .WithOne(w => w.Order)
-            //    .HasForeignKey(w => w.OrderId);
 
-          
+
+
+
+
+            modelBuilder.Entity<Order>()
+                .HasMany(o => o.Windows)
+                .WithOne(w => w.Order)
+                .HasForeignKey(w => w.OrderId);
+
+           modelBuilder.Entity<Window>()
+           .HasOne(w => w.Order)
+           .WithMany(o => o.Windows)
+           .HasForeignKey(w => w.OrderId);
 
             // Seed the data from the provided XML
             modelBuilder.Entity<Order>().HasData(

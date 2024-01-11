@@ -1,3 +1,4 @@
+using Blazored.Toast;
 using ManagingSalesApp.Server.DB;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,7 @@ namespace ManagingSalesApp
             string connection = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection)); // подключение к бд
             builder.Services.AddHttpContextAccessor();
+            builder.Services.AddBlazoredToast();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
