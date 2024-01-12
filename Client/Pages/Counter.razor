@@ -3,39 +3,46 @@
 @inject HttpClient Http
 @inject IToastService toastService
 <PageTitle>Show Orders</PageTitle>
+<h1>Visual display of all orders</h1>
+<style>
 
+    .on-loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(128, 128, 128, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999;
+    }
 
-<p>Visual display of all orders</p>
-
-@if (ordersName == null)
-{ //TODO сделать анимацию тут
-
-
-    <p><em>Loading...</em></p>
-}
-else{
-
+    .loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+    }
+</style>
+@if (ordersName != null){
     <div>
-        <label for="stateInput">Выберите заказа:</label>
-        <input type="text" id="orderSearch" @bind="selectedOrderName" list="ordersNameArray" placeholder="Поиск заказов" />
-   
+        <label for="stateInput">Select an order:</label>
+        <input type="text" id="orderSearch" @bind="selectedOrderName" list="ordersNameArray" placeholder="Search for orders" />
         <datalist id="ordersNameArray">
             @foreach (var orderName in ordersName)
             {
                 <option value="@orderName"></option>
             }
         </datalist>
-
         @if (selectedOrderName != "")
         {
-            <button @onclick="GetOneOrder" class="btn btn-primary" style="margin-right: 10px;">Получить выбранный заказ</button>      
+            <button @onclick="GetOneOrder" class="btn btn-primary" style="margin-right: 10px;">Receive the selected order</button>
         }
-        <button @onclick="GetAllOrders" class="btn btn-success" >Получить все заказы</button>
-        <BlazoredToasts />
+        <button @onclick="GetAllOrders" class="btn btn-success">Get all orders</button>
     </div>
-
-
-
     if (orders != null)
     {
         <link rel="stylesheet" href="css/styles.css" />
@@ -67,43 +74,52 @@ else{
                 </div>
             </div>
         }
-
-        
-
     }
 }
-
+@if (IsLoading)
+{
+    <div class="on-loading-overlay" id="app">
+        <div class="loader">
+            <img src="gifs/loader.gif" alt="Loading..." class="loader-image" />
+        </div>
+    </div>
+}
+<BlazoredToasts />
 @code {
     private Order[]? orders;
     private string[]? ordersName;
     private string selectedOrderName = "";
-
+    private bool IsLoading = false;
     protected override async Task OnInitializedAsync()
-    {  
-
+    {
+        IsLoading = true;
         ActivePageService.ActivePage = "counter";
         ordersName = await Http.GetFromJsonAsync<string[]>("Order/GetOrdersName");
+        IsLoading = false;
         StateHasChanged();
     }
-
- 
     private async void GetAllOrders()
     {        
         orders = await Http.GetFromJsonAsync<Order[]>("Order/GetAllOrders");
         selectedOrderName = "";
         StateHasChanged();
     }
-
     private async void GetOneOrder()
     {
         if (selectedOrderName != "")
         {
-            orders = await Http.GetFromJsonAsync<Order[]>($"Order/GetOneOrder?nameOrder={selectedOrderName}");
+            var order = await Http.GetFromJsonAsync<Order[]>($"Order/GetOneOrder?nameOrder={selectedOrderName}");
+            if (order != null && order.Length!= 0)
+            {
+                orders = order;
+            }
+            else
+            {
+                toastService.ShowInfo($"No order found");
+            }
             StateHasChanged();
         }
         else
-            toastService.ShowInfo($"Не выбрано название заказа");
+            toastService.ShowInfo($"Order name not selected");
     }
-
-
 }

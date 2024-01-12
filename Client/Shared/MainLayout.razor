@@ -5,33 +5,10 @@
         <NavMenu />
     </div>
     <main style="display: flex; flex-direction: column;">
-        <div class="top-row px-4" style="display: flex; justify-content: space-between; align-items: center;">
-@*           <h4><span>@ActivePageText</span></h4> 
-*@        </div>
+
         <article class="content px-4">
             @Body
         </article>
     </main>
 
 </div>
-@code {
-    //public static string ActivePageText;
-    private string ActivePageText => GetActivePageText();
-
-    private string GetActivePageText()
-    {
-        switch (ActivePageService.ActivePage)
-        {
-            case "/":
-                return "Welcome to test app for asdasd";
-            case "counter":
-                return "Show elements";
-            case "fetchdata":
-                return "Adding new elements";
-            case "editpage":
-                return "Edit elements";
-            default:
-                return string.Empty;
-        }
-    }
-}

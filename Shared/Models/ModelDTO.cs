@@ -7,10 +7,10 @@ namespace ManagingSalesApp.Shared
     public class Order
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "Поле 'Название' обязательно для заполнения.")]
+        [Required(ErrorMessage = "The 'Title' field is mandatory.")]
         public string Name { get; set; }
 
-        [Required(ErrorMessage = "Поле 'Штат' обязательно для заполнения.")]
+        [Required(ErrorMessage = "The 'Staff' field is mandatory.")]
         public string State { get; set; }
 
         public List<Window>? Windows { get; set; }
@@ -21,11 +21,11 @@ namespace ManagingSalesApp.Shared
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Поле 'Название' обязательно для заполнения.")]
+        [Required(ErrorMessage = "The 'Title' field is mandatory.")]
         public string Name {get; set; }
 
         [Required(ErrorMessage = "Поле 'Количество окон' обязательно для заполнения.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Значение 'Количество окон' должно быть больше 0.")]
+        [Range(1, int.MaxValue, ErrorMessage = "The 'Number of windows' field is mandatory.")]
         public int QuantityOfWindows { get; set; }
         public int TotalSubElements { get; set; }
 
@@ -43,13 +43,13 @@ namespace ManagingSalesApp.Shared
     public class SubElement
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "Поле 'Тип' обязательно для заполнения.")]
+        [Required(ErrorMessage = "The 'Type' field is mandatory")]
         public string Type { get; set; }
-        [Required(ErrorMessage = "Поле 'Ширина' обязательно для заполнения.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Значение 'Количество окон' должно быть больше 0.")]
+        [Required(ErrorMessage = "The 'Width' field is mandatory")]
+        [Range(1, int.MaxValue, ErrorMessage = "The 'Number of windows' value must be greater than 0")]
         public int Width { get; set; }
-        [Required(ErrorMessage = "Поле 'Высота' обязательно для заполнения.")]
-        [Range(1, int.MaxValue, ErrorMessage = "Значение 'Количество окон' должно быть больше 0.")]
+        [Required(ErrorMessage = "The 'Height' field is mandatory")]
+        [Range(1, int.MaxValue, ErrorMessage = "The 'Number of windows' value must be greater than 0")]
         public int Height { get; set; }
 
         // Foreign key
@@ -64,7 +64,6 @@ namespace ManagingSalesApp.Shared
         public string ErrorMessage { get; set; }
 
         public string KeyWord{get; set; }
-        // Дополнительные свойства, если необходимо
     }
     public class ActivePageService
     {

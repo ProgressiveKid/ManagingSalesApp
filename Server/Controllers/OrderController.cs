@@ -17,14 +17,13 @@ namespace ManagingSalesApp.Server.Controllers
             db = context;
             _httpContextAccessor = httpContextAccessor;
         }
-        // тут ShowAllOrders
         [HttpGet("GetAllOrders")]    
         public IEnumerable<Order> GetAllOrders()
         {
              var orders = db.Orders
-                        .Include(o => o.Windows)  // Включение данных по связи Order -> Window
+                        .Include(o => o.Windows) 
                             .ThenInclude(w => w.SubElements)
-                            .AsNoTracking()  // для ускор
+                            .AsNoTracking()  
                         .ToList();
             return orders;
         }
@@ -37,18 +36,17 @@ namespace ManagingSalesApp.Server.Controllers
         [HttpGet("GetOneOrder")]
         public IEnumerable<Order> GetOneOrder(string nameOrder)
         {
-            var order = db.Orders.AsNoTracking().Include(o => o.Windows)  // Включение данных по связи Order -> Window
+            var order = db.Orders.AsNoTracking().Include(o => o.Windows) 
                             .ThenInclude(w => w.SubElements).
-                            Where(u => u.Name == nameOrder).ToList(); // для ускор                     
+                            Where(u => u.Name == nameOrder).ToList();                    
             return order;
         }
-        // тут Create Orders
         [HttpPost("CreateOrder")]
         public IActionResult CreateOrder(Order order)
         {
             if (order.Name == "")
             {
-                return BadRequest("У заказа нет имени");
+                return BadRequest("The order doesn't have a name");
             }
             bool isUniqueName = !db.Orders.Any(o => o.Name == order.Name);
             if (isUniqueName)
@@ -67,8 +65,7 @@ namespace ManagingSalesApp.Server.Controllers
             }
             else
             {
-                //ModelState.AddModelError(nameof("Название заказа"), "Заказ с таким именем уже существует.");
-                return BadRequest("Заказ с таким именем уже существует");
+                return BadRequest("An order by that name already exists");
             }
         }
         [HttpPost("CreateWindow")]
@@ -99,24 +96,19 @@ namespace ManagingSalesApp.Server.Controllers
 
             foreach (var updatedWindow in order.Windows)
             {
-                // Находим соответствующее окно в существующем заказе
                 Window existingWindow = existingOrder.Windows.FirstOrDefault(w => w.Id == updatedWindow.Id);
 
                 if (existingWindow != null)
                 {
-                    // Обновление свойств окна
                     existingWindow.Name = updatedWindow.Name;
                     existingWindow.QuantityOfWindows = updatedWindow.QuantityOfWindows;
 
-                    // Обновление свойств подэлементов окна
                     foreach (var updatedSubElement in updatedWindow.SubElements)
                     {
-                        // Находим соответствующий подэлемент в существующем окне
                         SubElement existingSubElement = existingWindow.SubElements.FirstOrDefault(se => se.Id == updatedSubElement.Id);
 
                         if (existingSubElement != null)
                         {
-                            // Обновление свойств подэлемента
                             existingSubElement.Type = updatedSubElement.Type;
                             existingSubElement.Width = updatedSubElement.Width;
                             existingSubElement.Height = updatedSubElement.Height;
@@ -134,9 +126,6 @@ namespace ManagingSalesApp.Server.Controllers
             .ToList();
             db.Windows.RemoveRange(deletedWindows);
             db.SaveChanges();
-            // Ваша логика обновления заказа
-            // order содержит данные, переданные из клиентской стороны
-            // Возвращаем JSON-ответ с обновленным объектом Order
             return Ok(order);
         }
 
@@ -144,9 +133,8 @@ namespace ManagingSalesApp.Server.Controllers
         [HttpPut("DeleteOrder")]
         public IActionResult DeleteOrder(Order order)
         {
-            string message = $"Заказ {order.Name} № {order.Id} был удалён из базы данных";
+            string message = $"Order {order.Name} № {order.Id} has been deleted from the database";
 
-            // Находим заказ по его идентификатору в базе данных
             Order orderToDelete = db.Orders
                 .Include(o => o.Windows)
                 .ThenInclude(w => w.SubElements)
@@ -154,23 +142,18 @@ namespace ManagingSalesApp.Server.Controllers
 
             if (orderToDelete == null)
             {
-                // Заказ не найден в базе данных, обработайте это согласно вашей бизнес-логике.
-                return BadRequest("Заказ не найден в базе данных");
+                return BadRequest("Order not found in the database");
             }
 
-            // Удаляем все подэлементы связанных окон
             foreach (var window in orderToDelete.Windows)
             {
                 db.SubElements.RemoveRange(window.SubElements);
             }
 
-            // Удаляем все окна, связанные с заказом
             db.Windows.RemoveRange(orderToDelete.Windows);
 
-            // Удаляем сам заказ
             db.Orders.Remove(orderToDelete);
 
-            // Сохраняем изменения в базе данных
             db.SaveChanges();
             return Ok(message);
 
