@@ -58,4 +58,17 @@ namespace ManagingSalesApp.Shared
         [JsonIgnore]
         public Window? Window { get; set; }
     }
+
+    public class ErrorResponse
+    {
+        public string ErrorMessage { get; set; }
+
+        public string KeyWord{get; set; }
+        // Дополнительные свойства, если необходимо
+    }
+    public class ActivePageService
+    {
+        public string ActivePage { get; set; }
+    }
+
 }

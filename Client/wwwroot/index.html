@@ -11,11 +11,20 @@
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/app.css" rel="stylesheet" />
     <link href="ManagingSalesApp.Client.styles.css" rel="stylesheet" />
+    <style>
+        
 
+            #app img.loader {
+                width: 100px; /* Ширина изображения */
+                height: 100px; /* Высота изображения */
+            }
+    </style>
 </head>
 
 <body>
-    <div id="app">Loading...</div>
+    <div id="app">
+        <img src="gifs/loader.gif" alt="Loading..." class="loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    </div>
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.

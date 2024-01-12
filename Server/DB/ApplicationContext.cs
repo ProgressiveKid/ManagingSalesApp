@@ -3,7 +3,6 @@ using System.Xml.Linq;
 using ManagingSalesApp.Shared;
 using System.Data;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-
 namespace ManagingSalesApp.Server.DB
 {
     public class ApplicationContext : DbContext
@@ -11,20 +10,17 @@ namespace ManagingSalesApp.Server.DB
         public DbSet<Order> Orders { get; set; }
         public DbSet<Window> Windows { get; set; }
         public DbSet<SubElement> SubElements { get; set; }
-
         //private readonly IWebAssemblyHostEnvironment _environment;
-
         public ApplicationContext()
         {
         }
-
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
             if (Database.CanConnect())
             {
                 Console.WriteLine("База данных существует и подключение установлено.");
-                Database.EnsureDeleted();
-                Database.EnsureCreated();
+              //  Database.EnsureDeleted();
+              //  Database.EnsureCreated();
             }
             else
             { // первый вызов
@@ -32,22 +28,17 @@ namespace ManagingSalesApp.Server.DB
                 //Database.EnsureDeleted();
                 Database.EnsureCreated();
             }
-
         }
-
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    // Путь к файлу конфигурации
         //    var basePath = _environment.BaseAddress; // Вместо Directory.GetCurrentDirectory()
-
         //    var configuration = new ConfigurationBuilder()
         //        .SetBasePath(basePath)
         //        .AddJsonFile("appsettings.json", optional: true)
         //        .Build();
-
         //    // Получение строки подключения
         //    var connectionString = configuration.GetConnectionString("DefaultConnection");
-
         //    // Настройка подключения к базе данных
         //    optionsBuilder.UseSqlServer(connectionString);
         //}
@@ -55,28 +46,18 @@ namespace ManagingSalesApp.Server.DB
         {
             modelBuilder.Entity<Order>()
                 .HasKey(o => o.Id);
-
             modelBuilder.Entity<Window>()
                 .HasKey(w => w.Id);
-
             modelBuilder.Entity<SubElement>()
                 .HasKey(s => s.Id);
-
-
-
-
-
-
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.Windows)
                 .WithOne(w => w.Order)
                 .HasForeignKey(w => w.OrderId);
-
            modelBuilder.Entity<Window>()
            .HasOne(w => w.Order)
            .WithMany(o => o.Windows)
            .HasForeignKey(w => w.OrderId);
-
             // Seed the data from the provided XML
             modelBuilder.Entity<Order>().HasData(
                 new Order
@@ -92,7 +73,6 @@ namespace ManagingSalesApp.Server.DB
                     State = "CA"
                 }
             );
-
             modelBuilder.Entity<Window>().HasData(
                 new Window
                 {
@@ -127,7 +107,6 @@ namespace ManagingSalesApp.Server.DB
                     OrderId = 2
                 }
             );
-
             modelBuilder.Entity<SubElement>().HasData(
                 new SubElement
                 {
@@ -196,6 +175,4 @@ namespace ManagingSalesApp.Server.DB
             );
         }
     }
-
 }
-

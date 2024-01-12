@@ -1,0 +1,411 @@
+﻿@inject ActivePageService ActivePageService
+@inject IToastService toastService
+@inject HttpClient Http
+@page "/EditPage"
+<PageTitle>Edit Page</PageTitle>
+<style>
+    .image-container {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+        .image-container > div {
+            text-align: center;
+            margin-bottom: 30px; /* Увеличьте отступ между изображением и подписью */
+        }
+        .image-container img {
+            width: 10vw;
+            max-width: 75px;
+            height: auto;
+            cursor: pointer;
+            border-bottom: none !important; /* Убираем нижнюю внешнюю границу с использованием !important */
+        }
+    .form-section {
+        display: inline-block;
+        flex-direction: row;
+        margin-bottom: 10px; /* Добавление отступа снизу между секциями */
+        vertical-align: top;
+        margin-right: 10px;
+    }
+    .form-sectionScrolling {
+        display: inline-block;
+        flex-direction: row;
+        margin-bottom: 10px; /* Добавление отступа снизу между секциями */
+        vertical-align: top;
+        margin-right: 10px;
+        overflow: auto;
+        max-height: 200px;
+    }
+    div {
+        margin-bottom: 10px; /* Добавление отступа снизу каждого div */
+    }
+    label {
+        display: block; /* Установка display: block делает label блочным элементом,
+                                       что поможет контролировать расстояние между label и input */
+        margin-bottom: 5px; /* Добавление отступа снизу каждого label */
+    }
+    input {
+        margin-bottom: 10px; /* Добавление отступа снизу каждого input */
+    }
+    .on-loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(128, 128, 128, 0.5); /* Цвет фона с прозрачностью */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 999; /* Устанавливаем z-index больше, чем у других элементов */
+    }
+    .loader {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000; /* Устанавливаем z-index больше, чем у .on-loading-overlay */
+    }
+</style>
+<h3>EditPage</h3>
+<h4>Форма для редактирования заказа</h4>
+ @if (ordersName != null)
+   {
+        <div class="form-container">
+            <label for="stateInput">Выберите заказа:</label>
+            <input type="text" id="orderSearch" @bind="selectedOrderName" list="ordersNameArray" placeholder="Поиск заказов" />
+            <datalist id="ordersNameArray">
+                @foreach (var orderName in ordersName)
+                {
+                    <option value="@orderName"></option>
+                }
+            </datalist>
+            <button @onclick="GetOneOrder" class="btn btn-primary" style="margin-right: 20px;">Получить выбранный заказ</button>
+            @if (NewOrder.Windows != null)
+            {
+                  <button @onclick="EditOrderInDB" style="margin-left: 30px;" class="btn btn-success btn-block">Изменить заказ</button>
+                  <button @onclick="DeleteOrderInDB" style="margin-left: 50px;" class="btn btn-danger btn-block">Удалить заказ целиком</button>
+            }
+            <div>
+                @if (NewOrder != null && NewOrder.Name != "" && NewOrder.Id != 0)
+                {
+                    @if (NewOrder.Windows != null && NewOrder.Windows.Count != 0)
+                    {
+                        <div class="form-sectionScrolling" style="border: 1px solid black;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Название окна</th>
+                                        <th>Кол-во окон</th> <!-- Добавьте необходимые атрибуты -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var (window, index) in NewOrder.Windows.Select((w, i) => (w, i)))
+                                    {
+                                        <tr @onclick="() => HandleRowClick(window)"
+                                            style="@(IsRowSelected(window) ? "background-color: green; color: white; " : "")">
+                                            <td>@(index + 1)</td>
+                                            <td>@window.Name</td>
+                                            <td>@window.QuantityOfWindows</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    @if (NewOrder.Windows != null && NewWindow.SubElements != null)
+                    {
+                        <div class="form-sectionScrolling" style="margin-left: 30px; border: 1px solid black;">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>№</th>
+                                        <th>Тип</th>
+                                        <th>Ширина</th> <!-- Добавьте необходимые атрибуты -->
+                                        <th>Высота</th> <!-- Добавьте необходимые атрибуты -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var (subElement, index) in NewWindow.SubElements.Select((w, i) => (w, i)))
+                                    {
+                                        <tr @onclick="() => HandleRowSubElementClick(subElement)"
+                                            style="@(IsRowSubElementSelected(subElement)? "background-color: green; color: white; " : "")">
+                                            <td>@(index + 1)</td>
+                                            <td>@subElement.Type</td>
+                                            <td>@subElement.Height</td>
+                                            <td>@subElement.Width</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    <div style="border: 2px solid #000; padding: 10px;">
+                        <div class="form-section">
+                            <label for="nameInput">Добавление в заказ окна</label>
+                            <EditForm Model="@NewWindow">
+                                <DataAnnotationsValidator />
+                                <div>
+                                    <label>Название:</label>
+                                    <InputText @bind-Value="NewWindow.Name" />
+                                    <ValidationMessage For="@(() => NewWindow.Name)" />
+                                </div>
+                                <div>
+                                    <label>Количество окон:</label>
+                                    <InputNumber @bind-Value="NewWindow.QuantityOfWindows" />
+                                    <ValidationMessage For="@(() => NewWindow.QuantityOfWindows)" />
+                                </div>
+                                @if (NewOrder.Windows != null && NewWindow.SubElements != null)
+                                {
+                                    <label>Количество подэлементов у окна: @NewWindow.SubElements.Count</label>
+                                }
+                                <div class="row">
+                                    <div class="col">
+                                        <button type="submit" class="btn btn-primary btn-block">
+                                            @if (selectedWindow != null)
+                                            {
+                                                <span>Сохранить</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Добавить окно к заказу</span>
+                                            }
+                                        </button>
+                                    </div>
+                                    @if (selectedWindow != null)
+                                    {
+                                        <div class="col">
+                                            <button @onclick="DeleteWindow" class="btn btn-danger btn-block">Удалить</button>
+                                        </div>
+                                    }
+                                </div>
+                            </EditForm>
+                        </div>
+                        @if (NewOrder.Windows != null)
+                        {
+                            <div class="form-section" style="margin-left: 50px;">
+                                <label for="nameInput">Добавление в окно подэлементов</label>
+                                <EditForm Model="@NewSubElement">
+                                    <DataAnnotationsValidator />
+                                    <div>
+                                        <label>Тип:</label>
+                                        <InputText @bind-Value="NewSubElement.Type" />
+                                        <ValidationMessage For="@(() => NewSubElement.Type)" />
+                                    </div>
+                                    <div>
+                                        <label>Ширина:</label>
+                                        <InputNumber @bind-Value="NewSubElement.Width" />
+                                        <ValidationMessage For="@(() => NewSubElement.Width)" />
+                                    </div>
+                                    <div>
+                                        <label>Высота:</label>
+                                        <InputNumber @bind-Value="NewSubElement.Height" />
+                                        <ValidationMessage For="@(() => NewSubElement.Height)" />
+                                    </div>
+                                    <div class="row">
+                                        <div class="col">
+                                            <button type="submit" class="btn btn-primary btn-block">
+                                                @if (selectedSubElement != null)
+                                                {
+                                                    <span>Сохранить</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Добавить подэлемент в окно</span>
+                                                }
+                                            </button>
+                                        </div>
+                                        @if (selectedSubElement != null)
+                                        {
+                                            <div class="col">
+                                                <button @onclick="DeleteSubElement" class="btn btn-danger btn-block">Удалить</button>
+                                            </div>
+                                        }
+                                    </div>
+                                </EditForm>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+    </div>
+  }
+<BlazoredToasts />
+@if (IsLoading)
+{
+    <div class="on-loading-overlay" id="app">
+        <div class="loader">
+            <img src="gifs/loader.gif" alt="Loading..." class="loader-image" />
+        </div>
+    </div>
+}
+@code {
+    private bool IsLoading = false;
+    Order NewOrder = new Order();
+    private Order CurrentOrder;
+    Window selectedWindow;
+    SubElement selectedSubElement;
+    Window NewWindow = new Window();
+    SubElement NewSubElement = new SubElement();
+    string selectedOrderName = "";
+    private string[]? ordersName;
+    private async void GetOneOrder()
+    {
+        if (selectedOrderName != "")
+        {
+            IsLoading = true;
+            //NewOrder = new Order();
+            NewWindow = new Window();
+            NewSubElement = new SubElement();
+            IsLoading = true;
+            var orders = await Http.GetFromJsonAsync<Order[]>($"Order/GetOneOrder?nameOrder={selectedOrderName}");
+            if (orders != null && orders.Length != 0)
+            {
+                IsLoading = false;
+                NewOrder = orders.First();
+                StateHasChanged();
+            }else
+                toastService.ShowInfo($"Выбранный заказ не найден");
+        }
+        else
+            toastService.ShowInfo($"Не выбрано название заказа");
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+        ordersName = await Http.GetFromJsonAsync<string[]>("Order/GetOrdersName");
+        IsLoading = false;
+        ActivePageService.ActivePage = "editpage";
+        StateHasChanged();
+    }
+    private void DeleteSubElement()
+    {
+        if (NewWindow.SubElements.Contains(NewSubElement))
+        {
+            bool isGodd = NewWindow.SubElements.Remove(NewSubElement);
+            toastService.ShowInfo($"{selectedSubElement.Type} был удален из {NewWindow.Name}");
+            NewSubElement = new SubElement();
+            selectedSubElement = null;
+            StateHasChanged();
+        }
+        else
+        {
+            toastService.ShowError($"Ошибка удаления");
+        }
+    }
+    private void DeleteWindow()
+    {
+        if (NewOrder.Windows.Contains(NewWindow))
+        {
+            bool isGodd = NewOrder.Windows.Remove(NewWindow);
+            toastService.ShowInfo($"Окно было удалено из заказа{selectedWindow.Name}");
+            NewWindow = new Window();
+            NewSubElement = new SubElement();
+            selectedWindow = null;
+            selectedSubElement = null;
+            StateHasChanged();
+        }
+        else
+        {
+            toastService.ShowError($"Ошибка удаления");
+        }
+    }
+    private void HandleRowClick(Window clickedWindow)
+    {
+        // NewWindow = clickedWindow;
+        selectedWindow = clickedWindow;
+        NewWindow = clickedWindow; // это нужно для того, чтобы выбирать из таблицы окно
+        StateHasChanged(); // Важно вызывать StateHasChanged, чтобы обновить компонент
+    }
+    private void HandleRowSubElementClick(SubElement clickedSubElement)
+    {
+        NewSubElement = clickedSubElement;
+        selectedSubElement = clickedSubElement; // это нужно для того, чтобы выбирать из таблицы окно
+        StateHasChanged(); // Важно вызывать StateHasChanged, чтобы обновить компонент
+    }
+    private bool IsRowSelected(Window window)
+    {
+        return window == NewWindow;
+    }
+    private bool IsRowSubElementSelected(SubElement subElement)
+    {
+        return subElement == selectedSubElement;
+    }
+    private async Task EditOrderInDB()
+    {
+        IsLoading = true;
+        HttpResponseMessage response = await Http.PutAsJsonAsync("Order/EditOrder", NewOrder);
+        IsLoading = false;
+        if (response.IsSuccessStatusCode)
+        {
+            NewOrder = await response.Content.ReadFromJsonAsync<Order>();
+            toastService.ShowSuccess($"Изменили заказа {NewOrder.Name} Id № {NewOrder.Id}");
+            NewOrder = new Order();
+            NewWindow = new Window();
+            NewSubElement = new SubElement();
+            selectedWindow = null;
+            selectedSubElement = null;
+            // Далее можно выполнить дополнительные действия с полученными данными
+        }
+        else
+        {
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    toastService.ShowError($"Ошибка: {errorMessage}");
+                }
+                else
+                {
+                    toastService.ShowError($"Не удалось выполнить операцию. Пожалуйста, попробуйте еще раз.");
+                }
+            }
+            else
+                toastService.ShowError($"Ошибка: {response.StatusCode} - {response.ReasonPhrase}");
+            // string errorMessage = await response.Content.ReadAsStringAsync();
+            // Далее можно выполнить дополнительные действия с ошибкой
+        }
+    }
+    private async Task DeleteOrderInDB()
+    {
+        IsLoading = true;
+        HttpResponseMessage response = await Http.PutAsJsonAsync("Order/DeleteOrder", NewOrder);
+        if (response.IsSuccessStatusCode)
+        {
+            string message = await response.Content.ReadAsStringAsync();
+            toastService.ShowSuccess(message);
+            //    NewOrder.Windows.Clear();
+            NewOrder = new Order();
+            NewWindow = new Window();
+            NewSubElement = new SubElement();
+            Array.Clear(ordersName);
+            selectedOrderName = "";
+            selectedWindow = null;
+            selectedSubElement = null;
+            StateHasChanged();
+            ordersName = await Http.GetFromJsonAsync<string[]>("Order/GetOrdersName");
+            // Далее можно выполнить дополнительные действия с полученными данными
+        }
+        else
+        {
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(errorMessage))
+                {
+                    toastService.ShowError($"Ошибка: {errorMessage}");
+                }
+                else
+                {
+                    toastService.ShowError($"Не удалось выполнить операцию. Пожалуйста, попробуйте еще раз.");
+                }
+            }
+            else
+                toastService.ShowError($"Ошибка: {response.StatusCode} - {response.ReasonPhrase}");
+        }
+        IsLoading = false;
+    }
+}

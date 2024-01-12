@@ -1,5 +1,6 @@
 using Blazored.Toast;
 using ManagingSalesApp.Client;
+using ManagingSalesApp.Shared;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -14,7 +15,7 @@ namespace ManagingSalesApp.Client
             builder.RootComponents.Add<HeadOutlet>("head::after");
             builder.Services.AddBlazoredToast();
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
+            builder.Services.AddSingleton<ActivePageService>();
             await builder.Build().RunAsync();
         }
     }
