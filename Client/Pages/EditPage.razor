@@ -241,7 +241,10 @@
     </div>
 }
 @code {
-    Order NewOrder = new Order();
+
+
+
+    public Order NewOrder = new Order();
     Window NewWindow = new Window();
     SubElement NewSubElement = new SubElement();
     Order CurrentOrder;
@@ -259,20 +262,24 @@
             NewSubElement = new SubElement();
             var orders = await Http.GetFromJsonAsync<Order[]>($"Order/GetOneOrder?nameOrder={selectedOrderName}");
             IsLoading = false;
-            StateHasChanged();
+
             if (orders != null && orders.Length != 0)
             {
                 NewOrder = orders.First();
+
             }
             else
             {
                 toastService.ShowInfo($"Selected order not found");
                 selectedOrderName = "";
+                CurrentOrder = null;
             }
+            StateHasChanged();
         }
         else
             toastService.ShowInfo($"Order name not selected");
     }
+
     protected override async Task OnInitializedAsync()
     {
         IsLoading = true;
