@@ -3,47 +3,74 @@ using ManagingSalesApp.Shared;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+using Newtonsoft.Json;
+
 namespace ManagingSalesApp.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
     public class OrderController : ControllerBase
     {
-        ApplicationContext db;  
+        ApplicationContext db;
+        private readonly IMemoryCache _memoryCache;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public OrderController(ApplicationContext context, IHttpContextAccessor httpContextAccessor)
+        private readonly ILogger<OrderController> _logger;
+        public OrderController(ApplicationContext context, IHttpContextAccessor httpContextAccessor, ILogger<OrderController> logger, IMemoryCache memoryCache)
         {
             db = context;
+            _memoryCache = memoryCache;
             _httpContextAccessor = httpContextAccessor;
+            _logger = logger;
         }
-        [HttpGet("GetAllOrders")]    
+        public OrderController(ApplicationContext context)
+        {
+            db = context;
+        }
+        [HttpGet("GetAllOrders")]
         public IEnumerable<Order> GetAllOrders()
         {
-             var orders = db.Orders
-                        .Include(o => o.Windows) 
-                            .ThenInclude(w => w.SubElements)
-                            .AsNoTracking()  
-                        .ToList();
+            if (!_memoryCache.TryGetValue("AllOrders", out List<Order> orders))
+            {
+                orders = db.Orders
+                    .Include(o => o.Windows)
+                        .ThenInclude(w => w.SubElements)
+                    .AsNoTracking()
+                    .ToList();
+
+                _memoryCache.Set("AllOrders", orders, TimeSpan.FromMinutes(30));
+            }
+
             return orders;
         }
         [HttpGet("GetOrdersName")]
         public IEnumerable<string> GetOrdersName()
         {
-            List<string> orders = db.Orders.AsNoTracking().Select(u => u.Name).ToList();
+            if (!_memoryCache.TryGetValue("OrdersNames", out List<string> orders))
+            {
+                orders = db.Orders.AsNoTracking().Select(u => u.Name).ToList();
+
+                _memoryCache.Set("OrdersNames", orders, TimeSpan.FromMinutes(30));
+            }
+
             return orders;
         }
+
+
         [HttpGet("GetOneOrder")]
         public IEnumerable<Order> GetOneOrder(string nameOrder)
         {
+            LoggerMethod(nameOrder);
             var order = db.Orders.AsNoTracking().Include(o => o.Windows) 
                             .ThenInclude(w => w.SubElements).
-                            Where(u => u.Name == nameOrder).ToList();                    
+                            Where(u => u.Name == nameOrder).ToList();
             return order;
         }
         [HttpPost("CreateOrder")]
         public IActionResult CreateOrder(Order order)
         {
+            LoggerMethod(order);
             if (order.Name == "")
             {
                 return BadRequest("The order doesn't have a name");
@@ -70,8 +97,10 @@ namespace ManagingSalesApp.Server.Controllers
         }
         [HttpPost("CreateWindow")]
         public IActionResult CreateWindow(Window window)
-        {      
-                db.Windows.Add(window);
+        {
+            LoggerMethod(window);
+
+            db.Windows.Add(window);
                 if (window.SubElements != null)
                 {
                     db.SubElements.AddRange(window.SubElements);
@@ -82,6 +111,8 @@ namespace ManagingSalesApp.Server.Controllers
         [HttpPost("CreateSubElement")]
         public IActionResult CreateSubElement(SubElement subElement)
         {
+            LoggerMethod(subElement);
+
             db.SubElements.Add(subElement);
             db.SaveChanges();
             return Ok(subElement);
@@ -89,6 +120,8 @@ namespace ManagingSalesApp.Server.Controllers
         [HttpPut("EditOrder")]
         public IActionResult EditOrder(Order order)
         {
+            LoggerMethod(order);
+
             Order existingOrder = db.Orders
             .Include(o => o.Windows) // Включаем связанные окна для обновления
             .ThenInclude(w => w.SubElements) // Включаем связанные подэлементы для обновления
@@ -133,6 +166,8 @@ namespace ManagingSalesApp.Server.Controllers
         [HttpPut("DeleteOrder")]
         public IActionResult DeleteOrder(Order order)
         {
+            LoggerMethod(order);
+
             string message = $"Order {order.Name} № {order.Id} has been deleted from the database";
 
             Order orderToDelete = db.Orders
@@ -157,6 +192,12 @@ namespace ManagingSalesApp.Server.Controllers
             db.SaveChanges();
             return Ok(message);
 
+        }
+
+        public void LoggerMethod(object logMess)
+        {
+            var ipAddres = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress;
+            _logger.LogInformation($"Ip Addres: {ipAddres} \n Received data: {JsonConvert.SerializeObject(logMess)}");
         }
 
     }

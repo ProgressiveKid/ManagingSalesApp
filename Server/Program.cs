@@ -19,7 +19,9 @@ namespace ManagingSalesApp
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection)); // подключение к бд
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddBlazoredToast();
-            
+            builder.Services.AddLogging();
+            builder.Services.AddControllers();
+            builder.Services.AddMemoryCache();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

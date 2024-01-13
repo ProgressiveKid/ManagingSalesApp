@@ -10,7 +10,6 @@ namespace ManagingSalesApp.Server.DB
         public DbSet<Order> Orders { get; set; }
         public DbSet<Window> Windows { get; set; }
         public DbSet<SubElement> SubElements { get; set; }
-        //private readonly IWebAssemblyHostEnvironment _environment;
         public ApplicationContext()
         {
         }
@@ -18,6 +17,7 @@ namespace ManagingSalesApp.Server.DB
         {
             if (Database.CanConnect())
             {
+                
               //  Database.EnsureDeleted();
               //  Database.EnsureCreated();
             }
@@ -27,7 +27,11 @@ namespace ManagingSalesApp.Server.DB
                 Database.EnsureCreated();
             }
         }
-
+        protected override void OnConfiguring(DbContextOptionsBuilder options)
+        {
+            options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddFilter((category, level) =>
+                category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information)));
+        }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Order>()

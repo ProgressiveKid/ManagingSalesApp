@@ -86,7 +86,7 @@
 }
 <BlazoredToasts />
 @code {
-    private Order[]? orders;
+    public Order[]? orders;
     private string[]? ordersName;
     private string selectedOrderName = "";
     private bool IsLoading = false;
@@ -98,7 +98,7 @@
         IsLoading = false;
         StateHasChanged();
     }
-    private async void GetAllOrders()
+    public async void GetAllOrders()
     {        
         orders = await Http.GetFromJsonAsync<Order[]>("Order/GetAllOrders");
         selectedOrderName = "";
