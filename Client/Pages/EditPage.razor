@@ -242,8 +242,6 @@
 }
 @code {
 
-
-
     public Order NewOrder = new Order();
     Window NewWindow = new Window();
     SubElement NewSubElement = new SubElement();
@@ -293,14 +291,14 @@
         if (NewWindow.SubElements.Contains(NewSubElement))
         {
             bool isGodd = NewWindow.SubElements.Remove(NewSubElement);
-            toastService.ShowInfo($"{selectedSubElement.Type} был удален из {NewWindow.Name}");
+            toastService.ShowInfo($"{selectedSubElement.Type} was deleted from {NewWindow.Name}");
             NewSubElement = new SubElement();
             selectedSubElement = null;
             StateHasChanged();
         }
         else
         {
-            toastService.ShowError($"Ошибка удаления");
+            toastService.ShowError($"Deletion error");
         }
     }
     private void DeleteWindow()
@@ -308,7 +306,7 @@
         if (NewOrder.Windows.Contains(NewWindow))
         {
             bool isGodd = NewOrder.Windows.Remove(NewWindow);
-            toastService.ShowInfo($"Окно было удалено из заказа{selectedWindow.Name}");
+            toastService.ShowInfo($"The window has been removed from the order {selectedWindow.Name}");
             NewWindow = new Window();
             NewSubElement = new SubElement();
             selectedWindow = null;
@@ -317,7 +315,7 @@
         }
         else
         {
-            toastService.ShowError($"Ошибка удаления");
+            toastService.ShowError($"Deletion error");
         }
     }
     private void HandleRowClick(Window clickedWindow)
@@ -349,7 +347,7 @@
         if (response.IsSuccessStatusCode)
         {
             NewOrder = await response.Content.ReadFromJsonAsync<Order>();
-            toastService.ShowSuccess($"Изменили заказа {NewOrder.Name} Id № {NewOrder.Id}");
+            toastService.ShowSuccess($"Change orders {NewOrder.Name} Id № {NewOrder.Id}");
             NewOrder = new Order();
             NewWindow = new Window();
             NewSubElement = new SubElement();
@@ -363,15 +361,15 @@
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    toastService.ShowError($"Ошибка: {errorMessage}");
+                    toastService.ShowError($"Change orders: {errorMessage}");
                 }
                 else
                 {
-                    toastService.ShowError($"Не удалось выполнить операцию. Пожалуйста, попробуйте еще раз.");
+                    toastService.ShowError($"Failed to complete the operation. Please try again");
                 }
             }
             else
-                toastService.ShowError($"Ошибка: {response.StatusCode} - {response.ReasonPhrase}");
+                toastService.ShowError($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
     }
     private async Task DeleteOrderInDB()
@@ -399,15 +397,15 @@
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    toastService.ShowError($"Ошибка: {errorMessage}");
+                    toastService.ShowError($"Error: {errorMessage}");
                 }
                 else
                 {
-                    toastService.ShowError($"Не удалось выполнить операцию. Пожалуйста, попробуйте еще раз.");
+                    toastService.ShowError($"Failed to perform the operation. Please try again");
                 }
             }
             else
-                toastService.ShowError($"Ошибка: {response.StatusCode} - {response.ReasonPhrase}");
+                toastService.ShowError($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
         IsLoading = false;
     }

@@ -18,30 +18,16 @@ namespace ManagingSalesApp.Server.DB
         {
             if (Database.CanConnect())
             {
-                Console.WriteLine("База данных существует и подключение установлено.");
               //  Database.EnsureDeleted();
               //  Database.EnsureCreated();
             }
             else
-            { // первый вызов
-                //Console.WriteLine("База данных не существует или нет подключения.");
-                //Database.EnsureDeleted();
+            { // first call
+                
                 Database.EnsureCreated();
             }
         }
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    // Путь к файлу конфигурации
-        //    var basePath = _environment.BaseAddress; // Вместо Directory.GetCurrentDirectory()
-        //    var configuration = new ConfigurationBuilder()
-        //        .SetBasePath(basePath)
-        //        .AddJsonFile("appsettings.json", optional: true)
-        //        .Build();
-        //    // Получение строки подключения
-        //    var connectionString = configuration.GetConnectionString("DefaultConnection");
-        //    // Настройка подключения к базе данных
-        //    optionsBuilder.UseSqlServer(connectionString);
-        //}
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Order>()

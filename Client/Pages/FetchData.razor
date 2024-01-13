@@ -169,7 +169,7 @@
     {
         <div class="form-section">
             <div>
-                <button @onclick="AddOrderInDB" style="margin-top: 30px;" class="btn btn-success btn-block">Создать заказ</button>
+                <button @onclick="AddOrderInDB" style="margin-top: 30px;" class="btn btn-success btn-block">Create Order</button>
             </div>
         </div>
     }
@@ -524,7 +524,7 @@
         if (CurrentOrder != null)
         {
             selectedWindow = NewWindow;
-            toastService.ShowSuccess($"Окно создано в буфере");
+            toastService.ShowSuccess($"Window created in the buffer");
             return;
         }
         NewWindow = new Window();
@@ -537,7 +537,7 @@
         if (NewOrder.Windows.Contains(NewWindow))
         {
             bool isGodd = NewOrder.Windows.Remove(NewWindow);
-            toastService.ShowInfo($"Окно было удалено из заказа{selectedWindow.Name}");
+            toastService.ShowInfo($"The window has been removed from the order {selectedWindow.Name}");
             NewWindow = new Window();
             NewSubElement = new SubElement();
             selectedWindow = null;
@@ -546,7 +546,7 @@
         }
         else
         {
-            toastService.ShowError($"Ошибка удаления");
+            toastService.ShowError($"Deletion error");
         }
     }
     private void ToggleWindowSubMenu()
@@ -580,7 +580,7 @@
             var orders = await Http.GetFromJsonAsync<Order[]>($"Order/GetOneOrder?nameOrder={selectedOrderName}");
             if (orders == null && orders.Length == 0)
             {
-                toastService.ShowError($"Заказ не найден");
+                toastService.ShowError($"Order not found");
 
             }
             else
@@ -592,7 +592,7 @@
             StateHasChanged();
         }
         else
-            toastService.ShowInfo($"Не выбрано название заказа");
+            toastService.ShowInfo($"Order name not selected");
     }
     private async Task CreateOrder()
     {
@@ -619,21 +619,21 @@
         if (NewWindow.SubElements.Contains(NewSubElement))
         {
             bool isGodd = NewWindow.SubElements.Remove(NewSubElement);
-            toastService.ShowInfo($"{selectedSubElement.Type} был удален из {NewWindow.Name}");
+            toastService.ShowInfo($"{selectedSubElement.Type} has been removed from {NewWindow.Name}");
             NewSubElement = new SubElement();
             selectedSubElement = null;
             StateHasChanged();
         }
         else
         {
-            toastService.ShowError($"Ошибка удаления");
+            toastService.ShowError($"Deletion error");
         }
     }
     private async Task AddSubElement()
     {
         if (selectedWindow == null)
         {
-            toastService.ShowError($"Необходимо выбрать окно в которое будем добавлять подэлемент");
+            toastService.ShowError($"It is necessary to select a window to which we will add a subelement");
             return;
         }
         if (selectedSubElement != null)
@@ -658,7 +658,7 @@
         {
             if (selectedWindowName != "")
             {
-                toastService.ShowSuccess($"Под элемент создан в буфере");
+                toastService.ShowSuccess($"Under the element created in the buffer");
                 return;
             }
         }
@@ -702,7 +702,7 @@
         if (response.IsSuccessStatusCode)
         {
             NewOrder = await response.Content.ReadFromJsonAsync<Order>();
-            toastService.ShowSuccess($"Создали заказ {NewOrder.Name} с Id № {NewOrder.Id}");
+            toastService.ShowSuccess($"We've created an order {NewOrder.Name} with Id № {NewOrder.Id}");
             NewOrder = new Order();
             NewWindow = new Window();
             NewSubElement = new SubElement();
@@ -720,7 +720,7 @@
                 }
                 else
                 {
-                    toastService.ShowError($"Не удалось выполнить операцию. Пожалуйста, попробуйте еще раз.");
+                    toastService.ShowError($"Failed to complete the operation. Please try again.");
                 }
             }
             else
@@ -736,7 +736,7 @@
         if (response.IsSuccessStatusCode)
         {
             NewWindow = await response.Content.ReadFromJsonAsync<Window>();
-            toastService.ShowSuccess($"Добавили окно {NewWindow.Name} с Id № {NewWindow.Id}");
+            toastService.ShowSuccess($"Added a window {NewWindow.Name} with Id № {NewWindow.Id}");
             NewOrder = new Order();
             NewWindow = new Window();
             NewSubElement = new SubElement();
@@ -751,15 +751,15 @@
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 if (!string.IsNullOrEmpty(errorMessage))
                 {
-                    toastService.ShowError($"Ошибка: {errorMessage}");
+                    toastService.ShowError($"Error: {errorMessage}");
                 }
                 else
                 {
-                    toastService.ShowError($"Не удалось выполнить операцию. Пожалуйста, попробуйте еще раз.");
+                    toastService.ShowError($"Failed to perform the operation. Please try again");
                 }
             }
             else
-                toastService.ShowError($"Ошибка: {response.StatusCode} - {response.ReasonPhrase}");
+                toastService.ShowError($"Error: {response.StatusCode} - {response.ReasonPhrase}");
         }
     }
     private async Task AddSubElementInDB()
@@ -776,7 +776,7 @@
             if (response.IsSuccessStatusCode)
             {
                 NewSubElement = await response.Content.ReadFromJsonAsync<SubElement>();
-                toastService.ShowSuccess($"Добавили в окно {windows.Name} подэлемент {NewSubElement.Type} с Id № {NewSubElement.Id}");
+                toastService.ShowSuccess($"Added to the window {windows.Name} subelement {NewSubElement.Type} with Id № {NewSubElement.Id}");
                 NewOrder = new Order();
                 NewWindow = new Window();
                 NewSubElement = new SubElement();
@@ -791,20 +791,20 @@
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     if (!string.IsNullOrEmpty(errorMessage))
                     {
-                        toastService.ShowError($"Ошибка: {errorMessage}");
+                        toastService.ShowError($"Error: {errorMessage}");
                     }
                     else
                     {
-                        toastService.ShowError($"Не удалось выполнить операцию. Пожалуйста, попробуйте еще раз.");
+                        toastService.ShowError($"Failed to complete the operation. Please try again");
                     }
                 }
                 else
-                    toastService.ShowError($"Ошибка: {response.StatusCode} - {response.ReasonPhrase}");
+                    toastService.ShowError($"Error: {response.StatusCode} - {response.ReasonPhrase}");
             }
         }
         else
         {
-            toastService.ShowError($"Выбрано не корректное");
+            toastService.ShowError($"The wrong one has been chosen");
         }
     }
     #endregion
