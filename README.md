@@ -1,0 +1,1 @@
+![image](https://github.com/ProgressiveKid/ManagingSalesApp/assets/71317131/17bff4f0-95f6-476f-be1b-703a82fb2c96)![image](https://github.com/ProgressiveKid/ManagingSalesApp/assets/71317131/037e31a5-68b7-4817-8ffa-a8f1ae3f2091)
