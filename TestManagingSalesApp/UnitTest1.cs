@@ -11,12 +11,28 @@ using Microsoft.Extensions.DependencyInjection;
 using ManagingSalesApp.Server.DB;
 using ManagingSalesApp.Server.Controllers;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TestManagingSalesApp
 {
     public class UnitTest1 : TestContext
     {
-        [Fact]
+
+		[Fact]
+		public void IndexViewDataMessage()
+		{
+			// Arrange начальное условие
+			OrderController controller = new OrderController();
+
+			// Act выполняте тест
+			//ViewResult result = controller.Index() as ViewResult;
+
+			// Assert верефицируем рузельтат
+			///Assert.Equal("Hello world!", result?.ViewData["Message"]);
+		}
+
+
+		[Fact]
         public void TestYourPageInitialization()
         {
             // Arrange

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagingSalesApp.Client", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ManagingSalesApp.Shared", "Shared\ManagingSalesApp.Shared.csproj", "{009F173A-21BB-4EB6-A0C7-A9502F62D37F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestManagingSalesApp", "TestManagingSalesApp\TestManagingSalesApp.csproj", "{82F3845F-7D3B-41FA-AF92-F2173650F5C3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestManagingSalesApp", "TestManagingSalesApp\TestManagingSalesApp.csproj", "{82F3845F-7D3B-41FA-AF92-F2173650F5C3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

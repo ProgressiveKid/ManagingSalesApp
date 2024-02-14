@@ -24,38 +24,63 @@ namespace ManagingSalesApp.Server.Controllers
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
-        public OrderController(ApplicationContext context)
-        {
-            db = context;
-        }
-        [HttpGet("GetAllOrders")]
+
+		[HttpGet("GetAllOrders")]
         public IEnumerable<Order> GetAllOrders()
         {
-            if (!_memoryCache.TryGetValue("AllOrders", out List<Order> orders))
-            {
-                orders = db.Orders
+
+
+            List<SubElement> subElements = db.SubElements.ToList();
+
+			// Найти количество уникальных значений свойства Width
+			var uniqueWidthElements = subElements
+		         .GroupBy(subElement => new { subElement.Height, subElement.Width }) // Группировка по значению Width
+		         .Where(group => group.Count() == 1) // Выбрать только группы с одним элементом
+		         .SelectMany(group => group).ToList();
+
+
+            var myUnique = subElements.GroupBy(subElem => new { subElem.Width, subElem.Height })
+                .Where(u => u.Count() == 1).SelectMany(u => u)
+                .ToList();              
+
+			// Найти количество уникальных значений свойства Height
+			int uniqueHeightCount = subElements
+				.Select(subElement => subElement.Height) // Выбираем значения свойства Height
+				.Distinct() // Оставляем только уникальные значения
+				.Count(); // Подсчитываем количество уникальных значений
+
+
+            // для выборки уникальных значении нужно селект 
+            //select many нужно для выборки в листе инт и для их объединения в один
+
+			var SubElement = db.SubElements.ToList();
+
+
+
+
+				var orders = db.Orders
                     .Include(o => o.Windows)
                         .ThenInclude(w => w.SubElements)
                     .AsNoTracking()
                     .ToList();
 
-                _memoryCache.Set("AllOrders", orders, TimeSpan.FromMinutes(30));
-            }
+               
+            
 
             return orders;
         }
         [HttpGet("GetOrdersName")]
         public IEnumerable<string> GetOrdersName()
         {
-            if (!_memoryCache.TryGetValue("OrdersNames", out List<string> orders))
-            {
-                orders = db.Orders.AsNoTracking().Select(u => u.Name).ToList();
+			var orders = db.Orders.AsNoTracking().Select(u => u.Name).ToList();
 
-                _memoryCache.Set("OrdersNames", orders, TimeSpan.FromMinutes(30));
-            }
+             
 
             return orders;
         }
+
+
+
 
 
         [HttpGet("GetOneOrder")]
