@@ -22,7 +22,7 @@ namespace TestManagingSalesApp
 		public void IndexViewDataMessage()
 		{
 			// Arrange начальное условие
-			OrderController controller = new OrderController();
+			//derController controller = new OrderController();
 
 			// Act выполняте тест
 			//ViewResult result = controller.Index() as ViewResult;

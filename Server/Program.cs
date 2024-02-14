@@ -1,5 +1,8 @@
 using Blazored.Toast;
+using Blazored.Toast.Services;
 using ManagingSalesApp.Server.DB;
+using ManagingSalesApp.Server.Services;
+using ManagingSalesApp.Server.Services.Interfaces;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +20,9 @@ namespace ManagingSalesApp
             builder.Services.AddRazorPages();
             string connection = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection)); // подключение к бд
-            builder.Services.AddHttpContextAccessor();
+			builder.Services.AddTransient<IOrderService, OrderService>(); // транзит означает что будет создавать каждый раз при обращенини к этому сервису t
+			//builder.Services.AddSingleton<MyDataContext>();
+			builder.Services.AddHttpContextAccessor();
             builder.Services.AddBlazoredToast();
             builder.Services.AddLogging();
             builder.Services.AddControllers();
