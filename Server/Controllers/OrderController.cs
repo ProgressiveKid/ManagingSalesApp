@@ -12,18 +12,17 @@ namespace ManagingSalesApp.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class OrderController : ControllerBase
+    public class OrderController : Controller
     {
         ApplicationContext db;
 		private IOrderService _orderService;
-		private readonly IMemoryCache _memoryCache;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<OrderController> _logger;
-        public OrderController(ApplicationContext context, IHttpContextAccessor httpContextAccessor, ILogger<OrderController> logger, IMemoryCache memoryCache, IOrderService orderService)
+        public OrderController(ApplicationContext context, IHttpContextAccessor httpContextAccessor, ILogger<OrderController> logger, IOrderService orderService)
         {
             _orderService = orderService;
             db = context;
-            _memoryCache = memoryCache;
+          
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
@@ -48,10 +47,8 @@ namespace ManagingSalesApp.Server.Controllers
 		[HttpGet("GetAllOrders")]
         public IEnumerable<Order> GetAllOrders()
         {
-
             return _orderService.GetAllOrders();
         }
-
         [HttpGet("GetOrdersName")]
         public IEnumerable<string> GetOrdersName()
         {
@@ -62,7 +59,6 @@ namespace ManagingSalesApp.Server.Controllers
         {
             LoggerMethod(nameOrder);
             return _orderService.GetOneOrder(nameOrder);
-          
         }
         [HttpPost("CreateOrder")]
         public IActionResult CreateOrder(Order order)
@@ -72,7 +68,6 @@ namespace ManagingSalesApp.Server.Controllers
             if (resultOfCreate.First().Key)
             {
 				return Ok(resultOfCreate.First().Value);
-
 			} else
             return BadRequest(resultOfCreate.First().Value);
         }
@@ -82,7 +77,6 @@ namespace ManagingSalesApp.Server.Controllers
             LoggerMethod(window);
            Window createdWindow = _orderService.CreateWindow(window);
             return Ok(createdWindow);
-          
         }
         [HttpPost("CreateSubElement")]
         public IActionResult CreateSubElement(SubElement subElement)

@@ -1,0 +1,9 @@
+﻿когда мы запускаем это приложение в докере
+нам необходимо также запускать mssql в другом контейнере
+
+MSSQL
+docker run -d --name blazor-container --network mynetwork -p managingsalesApp.server
+
+ManagingApp
+docker build -t managingsalesapp .
+ docker run -d --name my-container1 --network my-network -p 8080:80 managingsalesapp

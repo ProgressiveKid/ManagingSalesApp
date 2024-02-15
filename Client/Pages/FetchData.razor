@@ -701,8 +701,8 @@
         IsLoading = false;
         if (response.IsSuccessStatusCode)
         {
-            NewOrder = await response.Content.ReadFromJsonAsync<Order>();
-            toastService.ShowSuccess($"We've created an order {NewOrder.Name} with Id № {NewOrder.Id}");
+            //NewOrder = await response.Content.ReadFromJsonAsync<Order>();
+            toastService.ShowSuccess($"We've created an order");
             NewOrder = new Order();
             NewWindow = new Window();
             NewSubElement = new SubElement();
