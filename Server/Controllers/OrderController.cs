@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Localization;
+using System.Text.Json;
+using System.Text;
 using Newtonsoft.Json;
+
 namespace ManagingSalesApp.Server.Controllers
 {
     [ApiController]
@@ -18,22 +21,28 @@ namespace ManagingSalesApp.Server.Controllers
 		private IOrderService _orderService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<OrderController> _logger;
-        public OrderController(ApplicationContext context, IHttpContextAccessor httpContextAccessor, ILogger<OrderController> logger, IOrderService orderService)
+		private readonly IHttpClientFactory _clientFactory;
+		private readonly IRabbitMqService _mqService;
+		public OrderController(ApplicationContext context, IHttpContextAccessor httpContextAccessor, ILogger<OrderController> logger, IOrderService orderService, IHttpClientFactory clientFactory, IRabbitMqService mqService)
         {
             _orderService = orderService;
             db = context;
           
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+			_clientFactory = clientFactory;
+			_mqService = mqService;
+			Console.WriteLine("Я конструктор и я вызвался");
         }
-        public string GetCountOfEniqueEl()
+		[HttpGet("GetCountOfEniqueEl")]
+		public string GetCountOfEniqueEl()
         {
 			List<SubElement> subElements = db.SubElements.ToList();
-			// Найти количество уникальных значений свойства Width
-			var uniqueWidthElements = subElements
-				 .GroupBy(subElement => new { subElement.Height, subElement.Width }) // Группировка по значению Width
-				 .Where(group => group.Count() == 1) // Выбрать только группы с одним элементом
-				 .SelectMany(group => group).ToList();
+            // Найти количество уникальных значений свойства Width
+            var uniqueWidthElements = subElements
+                 .GroupBy(subElement => new { subElement.Height, subElement.Width }) // Группировка по значению Width
+                 .Where(group => group.Count() == 1); // Выбрать только группы с одним элементом
+				// .SelectMany(group => group).ToList();
 			var myUnique = subElements.GroupBy(subElem => new { subElem.Width, subElem.Height })
 				.Where(u => u.Count() == 1).SelectMany(u => u)
 				.ToList();
@@ -61,13 +70,35 @@ namespace ManagingSalesApp.Server.Controllers
             return _orderService.GetOneOrder(nameOrder);
         }
         [HttpPost("CreateOrder")]
-        public IActionResult CreateOrder(Order order)
+        public async Task<IActionResult> CreateOrder(Order order)
         {
             LoggerMethod(order);
             Dictionary<bool, string> resultOfCreate = _orderService.CreateOrder(order);
             if (resultOfCreate.First().Key)
             {
+				var client = _clientFactory.CreateClient();
+               
+				// Формирование HTTP-запроса к другому контроллеру
+				var request = new HttpRequestMessage(HttpMethod.Get, $"RabbitMQ/SendMessage");
+
+				// Добавление данных в тело запроса (если необходимо)
+				request.Content = new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, "application/json");
+
+				// Отправка запроса
+				var response = await client.SendAsync(request);
+
+				// Проверка статуса ответа
+				if (response.IsSuccessStatusCode)
+				{
+					var responseContent = await response.Content.ReadAsStringAsync();
+					return Ok(responseContent);
+				}
+
+
+
 				return Ok(resultOfCreate.First().Value);
+
+
 			} else
             return BadRequest(resultOfCreate.First().Value);
         }

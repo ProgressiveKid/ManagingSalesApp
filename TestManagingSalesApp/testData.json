@@ -1,0 +1,85 @@
+﻿[
+  {
+    "id": 1,
+    "name": "New York Building 1",
+    "state": "NY",
+    "windows": [
+      {
+        "id": 1,
+        "name": "A51",
+        "quantityOfWindows": 4,
+        "totalSubElements": 3,
+        "subElements": [
+          {
+            "id": 1,
+            "type": "Doors",
+            "width": 1200,
+            "height": 1850,
+            "windowId": 1
+          },
+          {
+            "id": 2,
+            "type": "Window9XXL",
+            "width": 1500,
+            "height": 1100,
+            "windowId": 1
+          },
+          {
+            "id": 25,
+            "type": "123213",
+            "width": 1200,
+            "height": 1200,
+            "windowId": 1
+          }
+        ],
+        "orderId": 1
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "name": "123",
+    "state": "123",
+    "windows": [
+      {
+        "id": 13,
+        "name": "213",
+        "quantityOfWindows": 123,
+        "totalSubElements": 0,
+        "subElements": [
+          {
+            "id": 24,
+            "type": "1231",
+            "width": 123,
+            "height": 123,
+            "windowId": 13
+          }
+        ],
+        "orderId": 9
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "name": "213",
+    "state": "12321",
+    "windows": [
+      {
+        "id": 14,
+        "name": "123",
+        "quantityOfWindows": 123,
+        "totalSubElements": 0,
+        "subElements": [
+          {
+            "id": 26,
+            "type": "22",
+            "width": 22,
+            "height": 22,
+            "windowId": 14
+          }
+        ],
+        "orderId": 10
+      }
+    ]
+  }
+]

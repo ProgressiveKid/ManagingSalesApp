@@ -10,6 +10,8 @@
 
   <ItemGroup>
     <PackageReference Include="bunit" Version="1.26.64" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="6.0.26" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.3.2" />
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="xunit" Version="2.4.2" />
@@ -26,6 +28,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Client\ManagingSalesApp.Client.csproj" />
     <ProjectReference Include="..\Server\ManagingSalesApp.Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="testData.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
