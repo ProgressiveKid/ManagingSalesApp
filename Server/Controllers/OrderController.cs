@@ -76,28 +76,8 @@ namespace ManagingSalesApp.Server.Controllers
             Dictionary<bool, string> resultOfCreate = _orderService.CreateOrder(order);
             if (resultOfCreate.First().Key)
             {
-				var client = _clientFactory.CreateClient();
-               
-				// Формирование HTTP-запроса к другому контроллеру
-				var request = new HttpRequestMessage(HttpMethod.Get, $"RabbitMQ/SendMessage");
-
-				// Добавление данных в тело запроса (если необходимо)
-				request.Content = new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, "application/json");
-
-				// Отправка запроса
-				var response = await client.SendAsync(request);
-
-				// Проверка статуса ответа
-				if (response.IsSuccessStatusCode)
-				{
-					var responseContent = await response.Content.ReadAsStringAsync();
-					return Ok(responseContent);
-				}
-
-
-
+                _mqService.SendMessage($"Создался новый заказ - выезжайте на {order.State} монтаж");
 				return Ok(resultOfCreate.First().Value);
-
 
 			} else
             return BadRequest(resultOfCreate.First().Value);
