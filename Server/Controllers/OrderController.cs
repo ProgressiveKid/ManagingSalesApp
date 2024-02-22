@@ -10,6 +10,8 @@ using Microsoft.Extensions.Localization;
 using System.Text.Json;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.Extensions.Options;
+using System;
 
 namespace ManagingSalesApp.Server.Controllers
 {
@@ -76,7 +78,12 @@ namespace ManagingSalesApp.Server.Controllers
             Dictionary<bool, string> resultOfCreate = _orderService.CreateOrder(order);
             if (resultOfCreate.First().Key)
             {
-                _mqService.SendMessage($"Создался новый заказ - выезжайте на {order.State} монтаж");
+				// string a = JsonSerializer.SerializeToString(order);
+				string json = System.Text.Json.JsonSerializer.Serialize(order);
+
+				//string a = JsonConvert.SerializeObject(order);
+			//	_mqService.SendMessage($"Создался новый заказ - выезжайте на {order.State} монтаж");
+				_mqService.SendMessage(json);
 				return Ok(resultOfCreate.First().Value);
 
 			} else

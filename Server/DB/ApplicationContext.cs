@@ -12,6 +12,7 @@ namespace ManagingSalesApp.Server.DB
         public DbSet<SubElement> SubElements { get; set; }
         public ApplicationContext()
         {
+
         }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
@@ -27,12 +28,22 @@ namespace ManagingSalesApp.Server.DB
                 Database.EnsureCreated();
             }
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder options)
-        {
-            options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddFilter((category, level) =>
-                category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information)));
-        }
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //protected override void OnConfiguring(DbContextOptionsBuilder options)
+        //{
+
+        //    options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddFilter((category, level) =>
+        //        category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information)));
+        //}
+		string connection = "Host=ep-lingering-thunder-a5mstsaa.us-east-2.aws.neon.tech;"
+						 + "Username=jostonn;"
+						 + "Password=HIfUQL9PgRd4;"
+						 + "Database=managingDB;"
+						 + "Port=5432;"
+						 + "SSL Mode=Require;";
+		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+	   => optionsBuilder.UseNpgsql(connection);
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Order>()
                 .HasKey(o => o.Id);

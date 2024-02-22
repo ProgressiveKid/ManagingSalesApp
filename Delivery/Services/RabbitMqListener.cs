@@ -7,6 +7,7 @@ using System.Text;
 using System.Diagnostics;
 using System;
 using System.Text.Json;
+using ManagingSalesApp.Shared;
 
 namespace Delivery.Services
 {
@@ -27,21 +28,32 @@ namespace Delivery.Services
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			stoppingToken.ThrowIfCancellationRequested();
-			var consumer = new EventingBasicConsumer(_channel);
-			consumer.Received += (ch, ea) =>
+			try
 			{
-				var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+				stoppingToken.ThrowIfCancellationRequested();
+				var consumer = new EventingBasicConsumer(_channel);
+				consumer.Received += (ch, ea) =>
+				{
+					var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+					Debug.WriteLine($"Получено сообщение: {content}");
+					Console.WriteLine(content);
+					Order order = System.Text.Json.JsonSerializer.Deserialize<Order>(content);
+					
 
-				// Каким-то образом обрабатываем полученное сообщение
-				Debug.WriteLine($"Получено сообщение: {content}");
+					// Каким-то образом обрабатываем полученное сообщение
 
-				_channel.BasicAck(ea.DeliveryTag, false);
-			};
 
-			_channel.BasicConsume("MyQueue", false, consumer);
+					_channel.BasicAck(ea.DeliveryTag, false);
+				};
 
-			return Task.CompletedTask;
+				_channel.BasicConsume("MyQueue", false, consumer);
+				return Task.CompletedTask;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.Message);
+				return null;
+			}
 		}
 
 		public override void Dispose()

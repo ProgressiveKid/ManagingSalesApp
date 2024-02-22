@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
+using Npgsql;
+
 namespace ManagingSalesApp
 {
     public class Program
@@ -18,7 +20,7 @@ namespace ManagingSalesApp
             // Add services to the container.
 			builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
-            string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+           // string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 			string localConnection = builder.Configuration.GetConnectionString("FallBackConnection");
 			//builder.Services.AddDbContext<ApplicationContext>(options =>
 			//{
@@ -42,23 +44,21 @@ namespace ManagingSalesApp
 			//		);
 			//	});
 			//});
-			
+			string connection = builder.Configuration.GetConnectionString("NeonTech");
+			//string connection = "Host=ep-lingering-thunder-a5mstsaa.us-east-2.aws.neon.tech;"
+			//			 + "Username=jostonn;"
+			//			 + "Password=HIfUQL9PgRd4;"
+			//			 + "Database=managingDB;"
+			//			 + "Port=5432;"
+			//			 + "SSL Mode=Require;";
+
 			builder.Services.AddDbContext<ApplicationContext>(options =>
 			{
 				try
 				{
-					options.UseSqlServer(connection, sqlOptions =>
-					{
-						sqlOptions.EnableRetryOnFailure(
-							maxRetryCount: 5, // максимальное количество попыток подключени€
-							maxRetryDelay: TimeSpan.FromSeconds(2), // максимальна€ задержка между попытками
-							errorNumbersToAdd: null // ошибки, которые должны вызывать повторные попытки
-						);
-					});
-					using (var context = new ApplicationContext())
-					{
-						context.Database.OpenConnection(); // ѕопытка открыть соединение
-					}
+
+					options.UseNpgsql(connection);
+				
 					// ≈сли соединение открыто успешно, можно установить настройки контекста
 				}
 				catch (Exception ex)
