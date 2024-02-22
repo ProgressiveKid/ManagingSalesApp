@@ -22,35 +22,7 @@ namespace ManagingSalesApp
             builder.Services.AddRazorPages();
            // string connection = builder.Configuration.GetConnectionString("DefaultConnection");
 			string localConnection = builder.Configuration.GetConnectionString("FallBackConnection");
-			//builder.Services.AddDbContext<ApplicationContext>(options =>
-			//{
-			//	options.UseSqlServer(connection, sqlOptions =>
-			//	{
-			//		sqlOptions.EnableRetryOnFailure(
-			//			maxRetryCount: 5, // максимальное количество попыток подключения
-			//			maxRetryDelay: TimeSpan.FromSeconds(2), // максимальная задержка между попытками
-			//			errorNumbersToAdd: null // ошибки, которые должны вызывать повторные попытки
-			//		);
-			//	});
-			//});
-			//builder.Services.AddDbContext<ApplicationContext>(options =>
-			//{
-			//	options.UseSqlServer(localConnection, sqlOptions =>
-			//	{
-			//		sqlOptions.EnableRetryOnFailure(
-			//			maxRetryCount: 5, // максимальное количество попыток подключения
-			//			maxRetryDelay: TimeSpan.FromSeconds(30), // максимальная задержка между попытками
-			//			errorNumbersToAdd: null // ошибки, которые должны вызывать повторные попытки
-			//		);
-			//	});
-			//});
 			string connection = builder.Configuration.GetConnectionString("NeonTech");
-			//string connection = "Host=ep-lingering-thunder-a5mstsaa.us-east-2.aws.neon.tech;"
-			//			 + "Username=jostonn;"
-			//			 + "Password=HIfUQL9PgRd4;"
-			//			 + "Database=managingDB;"
-			//			 + "Port=5432;"
-			//			 + "SSL Mode=Require;";
 
 			builder.Services.AddDbContext<ApplicationContext>(options =>
 			{
