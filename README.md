@@ -1,3 +1,4 @@
+cloud hosting with test demonstration of the application - https://managingsalesapp.onrender.com/
 Blazor WebAssembly app for managing sales order data which includes MSSQL DB, ORM (Entity Fraemwork), LINQ, this web application solves the following problems: organizing orders for window installation, adding, editing, deleting orders, windows to orders, sub-elements to windows.
 
 Screenshots of the web application work
