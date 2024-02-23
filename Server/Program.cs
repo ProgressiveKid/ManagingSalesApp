@@ -20,33 +20,98 @@ namespace ManagingSalesApp
             // Add services to the container.
 			builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
-           // string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+			// string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+			//	string connection = builder.Configuration.GetConnectionString("NeonTech");
 			string localConnection = builder.Configuration.GetConnectionString("FallBackConnection");
-			string connection = builder.Configuration.GetConnectionString("NeonTech");
 
+			string connection = builder.Configuration.GetConnectionString("NeonTech");
+			bool isFirstConnection = true;
 			builder.Services.AddDbContext<ApplicationContext>(options =>
 			{
 				try
 				{
 
 					options.UseNpgsql(connection);
-				
+					options.EnableServiceProviderCaching(false); // Отключаем кэширование провайдера для возможнос
+					
 					// Если соединение открыто успешно, можно установить настройки контекста
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine("Не удалось подключиться к первой базе данных: ");
-					Console.WriteLine("Используем второе подключение...");
-					options.UseSqlServer(localConnection, sqlOptions =>
-					{
-						sqlOptions.EnableRetryOnFailure(
-							maxRetryCount: 5, // максимальное количество попыток подключения
-							maxRetryDelay: TimeSpan.FromSeconds(30), // максимальная задержка между попытками
-							errorNumbersToAdd: null // ошибки, которые должны вызывать повторные попытки
-						);
-					});
+					isFirstConnection = false;
 				}
 			});
+			ServiceDescriptor dbContextRegistration = null;
+			var serviceProvider = builder.Services.BuildServiceProvider();
+			using (var scope = serviceProvider.CreateScope())
+			{
+				var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationContext>();
+
+				try
+				{
+					if (dbContext.Database.CanConnect())
+					{
+						// Подключение успешно установлено
+						Console.WriteLine("Соединение с базой данных установлено.");
+					}
+					else
+					{
+						// Не удалось установить соединение
+						dbContextRegistration = builder.Services.FirstOrDefault(descriptor =>
+						descriptor.ServiceType == typeof(ApplicationContext));
+						builder.Services.Remove(dbContextRegistration);
+						builder.Services.AddDbContext<ApplicationContext>(options =>
+						{
+							isFirstConnection = false;
+							Console.WriteLine("Не удалось подключиться к первой базе данных: ");
+							Console.WriteLine("Используем второе подключение...");
+							options.UseSqlServer(localConnection, sqlOptions =>
+							{
+								sqlOptions.EnableRetryOnFailure(
+									maxRetryCount: 5, // максимальное количество попыток подключения
+									maxRetryDelay: TimeSpan.FromSeconds(30), // максимальная задержка между попытками
+									errorNumbersToAdd: null // ошибки, которые должны вызывать повторные попытки
+								);
+							});
+						});
+						Console.WriteLine("Не удалось установить соединение с базой данных.");
+					}
+				}
+				catch (Exception ex)
+				{
+					// Обработка ошибок подключения
+					Console.WriteLine($"Ошибка подключения: {ex.Message}");
+				}
+			}
+				
+			//if (!isFirstConnection)
+			//{
+			//	dbContextRegistration = builder.Services.FirstOrDefault(descriptor =>
+			//			descriptor.ServiceType == typeof(ApplicationContext));
+			//	if (dbContextRegistration != null)
+			//	{
+			//		builder.Services.Remove(dbContextRegistration);
+			//	}
+			//	builder.Services.AddDbContext<ApplicationContext>(options =>
+			//	{				
+			//		isFirstConnection = false;
+			//		Console.WriteLine("Не удалось подключиться к первой базе данных: ");
+			//		Console.WriteLine("Используем второе подключение...");
+			//		options.UseSqlServer(localConnection, sqlOptions =>
+			//		{
+			//			sqlOptions.EnableRetryOnFailure(
+			//				maxRetryCount: 5, // максимальное количество попыток подключения
+			//				maxRetryDelay: TimeSpan.FromSeconds(30), // максимальная задержка между попытками
+			//				errorNumbersToAdd: null // ошибки, которые должны вызывать повторные попытки
+			//			);
+			//		});
+			//	});
+
+
+
+			//}
+
+
 			//	builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connection)); // подключение к бд
 			builder.Services.AddTransient<IOrderService, OrderService>(); // транзит означает что будет создавать каждый раз при обращенини к этому сервису t
 			builder.Services.AddSingleton<IRabbitMqService, RabbitMqService>();

@@ -16,16 +16,24 @@ namespace ManagingSalesApp.Server.DB
         }
         public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
         {
-            if (Database.CanConnect())
+            try
             {
-                
-              //  Database.EnsureDeleted();
-              //  Database.EnsureCreated();
+                if (Database.CanConnect())
+                {
+
+                    //  Database.EnsureDeleted();
+                    //  Database.EnsureCreated();
+                }
+                else
+                { // first call
+
+                    Database.EnsureCreated();
+                }
+
             }
-            else
-            { // first call
-                
-                Database.EnsureCreated();
+            catch (Exception ex)
+            { 
+            
             }
         }
         protected override void OnConfiguring(DbContextOptionsBuilder options)

@@ -81,9 +81,7 @@ namespace ManagingSalesApp.Server.Controllers
 				// string a = JsonSerializer.SerializeToString(order);
 				string json = System.Text.Json.JsonSerializer.Serialize(order);
 
-				//string a = JsonConvert.SerializeObject(order);
-			//	_mqService.SendMessage($"Создался новый заказ - выезжайте на {order.State} монтаж");
-				_mqService.SendMessage(json);
+				//_mqService.SendMessage(json); на время выключил работу с брокером сообщении
 				return Ok(resultOfCreate.First().Value);
 
 			} else
@@ -93,7 +91,7 @@ namespace ManagingSalesApp.Server.Controllers
         public IActionResult CreateWindow(Window window)
         {
             LoggerMethod(window);
-           Window createdWindow = _orderService.CreateWindow(window);
+            Window createdWindow = _orderService.CreateWindow(window);
             return Ok(createdWindow);
         }
         [HttpPost("CreateSubElement")]
