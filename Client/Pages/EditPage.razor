@@ -73,20 +73,20 @@
    {
         <div class="form-container">
         <label for="stateInput">Select an order:</label>
-        <input type="text" id="orderSearch" @bind="selectedOrderName" list="ordersNameArray" placeholder="Search for orders" />
-            <datalist id="ordersNameArray">
+        <input type="text" id="orderSearch" @bind="selectedOrderName" list="ordersNameArray" placeholder="Search for orders" style="width: 300px;" />
+        <datalist id="ordersNameArray">
                 @foreach (var orderName in ordersName)
                 {
                     <option value="@orderName"></option>
                 }
             </datalist>
-        <button @onclick="GetOneOrder" class="btn btn-primary" style="margin-right: 20px;">Receive the selected order</button>
+        <button @onclick="GetOneOrder" class="btn btn-primary" style="margin-left: 20px;">Receive the selected order</button>
             @if (NewOrder.Windows != null)
             {
             <button @onclick="EditOrderInDB" style="margin-left: 30px;" class="btn btn-success btn-block">Change order</button>
             <button @onclick="DeleteOrderInDB" style="margin-left: 50px;" class="btn btn-danger btn-block">Delete entire order</button>
             }
-            <div>
+            <div style="margin-top: 20px">
                 @if (NewOrder != null && NewOrder.Name != "" && NewOrder.Id != 0)
                 {
                     @if (NewOrder.Windows != null && NewOrder.Windows.Count != 0)

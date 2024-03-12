@@ -3,7 +3,6 @@ using ManagingSalesApp.Server.Services.Interfaces;
 using ManagingSalesApp.Shared;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-
 namespace ManagingSalesApp.Server.Services
 {
 	public class OrderService : IOrderService
@@ -11,7 +10,7 @@ namespace ManagingSalesApp.Server.Services
 		private ApplicationContext db;
 		public OrderService(ApplicationContext constructDb)
 		{
-			db = constructDb;	
+			db = constructDb;
 		}
 		public List<Order> GetAllOrders()
 		{
@@ -54,7 +53,7 @@ namespace ManagingSalesApp.Server.Services
 					}
 				}
 				db.SaveChanges();
-				return new Dictionary<bool, string> { {true, $"Order was created with {order.Id} ID" } };
+				return new Dictionary<bool, string> { { true, $"Order was created with {order.Id} ID" } };
 			}
 			else
 			{
@@ -113,7 +112,6 @@ namespace ManagingSalesApp.Server.Services
 			db.SaveChanges();
 			return order;
 		}
-
 		public Dictionary<bool, string> DeleteOrder(Order order)
 		{
 			string message = $"Order {order.Name} № {order.Id} has been deleted from the database";
@@ -132,9 +130,7 @@ namespace ManagingSalesApp.Server.Services
 			db.Windows.RemoveRange(orderToDelete.Windows);
 			db.Orders.Remove(orderToDelete);
 			db.SaveChanges();
-			 return new Dictionary<bool, string> { { true, message } };
-			
-
+			return new Dictionary<bool, string> { { true, message } };
 		}
 	}
 }
